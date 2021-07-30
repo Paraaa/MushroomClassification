@@ -5,6 +5,8 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
+from tensorflow.python.keras import activations
+from tensorflow.python.keras.layers.core import Dense
 from tensorflow.python.keras.metrics import accuracy
 from plotter import Plotter
 
@@ -21,7 +23,7 @@ for column in mushroom_dataset.columns:
         mushroom_dataset[column] = mushroom_dataset[column].replace(element, index)
 
 #create train and test sets
-train_dataset = mushroom_dataset.sample(frac=0.8, random_state=0)
+train_dataset = mushroom_dataset.sample(frac=0.8, random_state=42)
 test_dataset  = mushroom_dataset.drop(train_dataset.index)
 #create features for test and train set
 train_features = train_dataset.copy()
@@ -30,7 +32,6 @@ test_features  = test_dataset.copy()
 train_labels   = train_features.pop("class")
 test_labels    = test_features.pop("class")
 
-plotter.pairplot(mushroom_dataset)
 
 #build model
 model = tf.keras.Sequential([
@@ -42,7 +43,7 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
               loss="binary_crossentropy",
               metrics=["accuracy"])
 
-history = model.fit(train_features, train_labels,validation_split=0.2, epochs=20, batch_size=32)
+history = model.fit(train_features, train_labels,validation_split=0.2, epochs=80, batch_size=64)
 test_loss, test_accuracy = model.evaluate(test_features, test_labels, verbose=2)
 
 print("Test loss: ", test_loss)
